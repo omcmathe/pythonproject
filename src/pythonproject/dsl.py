@@ -59,7 +59,7 @@ class dependency:
 
             return final
         else:
-            return f"{self.target.stem} @ file:///{self.target}"
+            return f"{self.target.stem} @ file://{self.target}"
 
 
 dep = dependency
