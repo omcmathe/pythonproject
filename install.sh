@@ -7,7 +7,11 @@ if [ -z "$PYTHON" ]; then
     exit 1
 fi
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -n "${BASH_SOURCE[0]+x}" ]]; then
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+else
+    SCRIPT_DIR="$(pwd)"
+fi
 if [ -f "$SCRIPT_DIR/pyproject.toml" ]; then
     SRCDIR="$SCRIPT_DIR"
 else
