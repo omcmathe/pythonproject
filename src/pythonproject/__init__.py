@@ -151,8 +151,9 @@ if _caller_file:
             regular_deps = []
             editable_deps = []
             for dep_str in all_packages:
-                if " @ file:///" in dep_str:
-                    editable_deps.append(dep_str)
+                if "@ file://" in dep_str:
+                    location_str = dep_str.split("file://")[1].strip()
+                    editable_deps.append(location_str)
                 else:
                     regular_deps.append(dep_str)
 
