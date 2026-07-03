@@ -1,7 +1,14 @@
 [project]
 name = "pythonproject"
 version = "0.1.0"
+description = "A Python DSL for declaring python project configurations."
+readme = "README.md"
 requires-python = ">= 3.12"
+authors = [
+    {name = "omcmathe"},
+]
+license = {text = "MIT"}
+license-files = ["LICENSE"]
 
 [build-system]
 requires = ["setuptools >= 77.0.3"]
