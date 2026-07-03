@@ -67,6 +67,20 @@ def _detect_caller() -> str | None:
 # 3. Secure Hook Setup on Import
 _caller_file = _detect_caller()
 
+_execution_failed = False
+
+_original_excepthook = sys.excepthook
+
+
+def _custom_excepthook(type, value, traceback):
+    global _execution_failed
+    _execution_failed = True
+    _original_excepthook(type, value, traceback)
+
+
+sys.excepthook = _custom_excepthook
+
+
 if _caller_file:
     # Immediately trigger AST check BEFORE allowing standard line execution
     _validator = PyProjectASTValidator()
@@ -76,6 +90,7 @@ if _caller_file:
         for err in _validator.errors:
             print(f"  - {err}")
         print("\nEvaluation halted. No output or modifications were made.")
+        _execution_failed = True
         sys.exit(1)
 
     # Lazily register compilation and provisioning loop to fire at runtime exit
@@ -84,7 +99,7 @@ if _caller_file:
         import subprocess
 
         # Do not overwrite configurations if the user's execution runtime crashed
-        if sys.exc_info()[0] is not None:
+        if _execution_failed:
             print("\n⚠️ Compilation aborted due to an execution error in the script.")
             return
 
