@@ -24,6 +24,7 @@ class PyProjectASTValidator(ast.NodeVisitor):
             "dependency",
             "dep",
             "BuildSystem",
+            "Path",
         }
 
     def validate_file(self, filepath: str) -> bool:
@@ -117,7 +118,12 @@ class PyProjectASTValidator(ast.NodeVisitor):
         if isinstance(node, ast.List):
             return all(self._is_declarative_value(el) for el in node.elts)
         if isinstance(node, ast.Dict):
-            return all(self._is_declarative_value(k) for k in node.keys) and all(
-                self._is_declarative_value(v) for v in node.values
-            )
+            return all(
+                k is not None and self._is_declarative_value(k) for k in node.keys
+            ) and all(self._is_declarative_value(v) for v in node.values)
+        if isinstance(node, ast.Call):
+            if isinstance(node.func, ast.Name) and node.func.id in self.allowed_calls:
+                return all(
+                    self._is_declarative_value(arg) for arg in node.args
+                ) and all(self._is_declarative_value(kw.value) for kw in node.keywords)
         return False
