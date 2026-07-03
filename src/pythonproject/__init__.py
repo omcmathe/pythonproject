@@ -14,6 +14,7 @@ from .dsl import (
     PDM,
     uv_build,
 )
+from pathlib import Path
 
 
 __all__ = [
@@ -31,13 +32,13 @@ __all__ = [
     "Flit",
     "PDM",
     "uv_build",
+    "Path",
 ]
 
 
 # ----
 
 
-from pathlib import Path
 import sys
 import atexit
 import inspect
@@ -131,7 +132,21 @@ if _caller_file:
                 check=True,
                 capture_output=True,
             )
-            subprocess.run([str(pip_path), "install"] + all_packages, check=True)
+
+            regular_deps = []
+            editable_deps = []
+            for dep_str in all_packages:
+                if " @ file:///" in dep_str:
+                    editable_deps.append(dep_str)
+                else:
+                    regular_deps.append(dep_str)
+
+            if regular_deps:
+                subprocess.run([str(pip_path), "install"] + regular_deps, check=True)
+
+            for dep_str in editable_deps:
+                subprocess.run([str(pip_path), "install", "-e", dep_str], check=True)
+
             print(
                 "✓ Local packages synchronized and environment configured successfully! 🎉"
             )

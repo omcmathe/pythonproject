@@ -37,12 +37,15 @@ class dependency:
 
         if args:
             if isinstance(args[0], Path):
-                _path = args[0]
+                _path = args[0].resolve()
             elif isinstance(args[0], str):
                 _name = args[0]
 
             if len(args) > 1:
                 _version = args[1]
+
+        if _path and isinstance(_path, Path):
+            _path = _path.resolve()
 
         self.target: str | Path = _name or _path or ""
         self.version: version | None = _version
