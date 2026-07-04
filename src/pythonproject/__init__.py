@@ -55,11 +55,13 @@ def _detect_caller() -> str | None:
     if main_module is not None:
         main_file = getattr(main_module, "__file__", None)
 
-        if isinstance(main_file, str):
+        if isinstance(main_file, str) and "src/pythonproject" not in main_file:
             return str(Path(main_file).resolve())
 
     for frame_info in inspect.stack():
         filename = frame_info.filename
+        if "src/pythonproject" in filename:
+            continue
 
         return str(Path(filename).resolve())
     return None
@@ -82,7 +84,7 @@ def _custom_excepthook(type, value, traceback):
 sys.excepthook = _custom_excepthook
 
 
-if _caller_file:
+if _caller_file and Path(_caller_file).exists():
     # Immediately trigger AST check BEFORE allowing standard line execution
     _validator = PyProjectASTValidator()
 
@@ -151,9 +153,8 @@ if _caller_file:
             regular_deps = []
             editable_deps = []
             for dep_str in all_packages:
-                if "@ file://" in dep_str:
-                    location_str = dep_str.split("file://")[1].strip()
-                    editable_deps.append(location_str)
+                if " @ file://" in dep_str:
+                    editable_deps.append(dep_str)
                 else:
                     regular_deps.append(dep_str)
 

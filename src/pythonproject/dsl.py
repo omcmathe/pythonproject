@@ -55,11 +55,11 @@ class dependency:
             final = self.target
 
             if self.version:
-                final += str(self.version)
+                final += " >= " + str(self.version)
 
             return final
         else:
-            return f"{self.target.stem} @ file://{self.target}"
+            return f"{self.target.stem} @ {self.target.as_uri()}"
 
 
 dep = dependency
@@ -80,7 +80,7 @@ def project(
 
     __REGISTRY.register_project(
         name=name,
-        version=">= " + str(version),
+        version=str(version),
         description=description,
         requires_python=str(requires_python) if requires_python else None,
         dependencies=[str(dep) for dep in dependencies] if dependencies else None,
