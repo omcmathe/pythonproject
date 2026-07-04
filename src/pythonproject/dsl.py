@@ -80,9 +80,9 @@ def project(
 
     __REGISTRY.register_project(
         name=name,
-        version=">= " + str(version),
+        version=str(version),
         description=description,
-        requires_python=str(requires_python) if requires_python else None,
+        requires_python=(">= " + str(requires_python)) if requires_python else None,
         dependencies=[str(dep) for dep in dependencies] if dependencies else None,
         readme=str(readme) if readme else None,
         license=license,
